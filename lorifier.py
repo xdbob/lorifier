@@ -127,5 +127,5 @@ if __name__ == "__main__":
     e = muttemail(sys.stdin.read())
     e.create_xdate_header()
     e.create_xuri_header()
-    e.remove_header("Message-ID")
+    #e.remove_header("Message-ID")
     sys.stdout.write(e.as_string())

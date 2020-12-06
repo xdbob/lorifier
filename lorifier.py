@@ -42,9 +42,13 @@ class muttemail:
         if not date:
             return
 
-        tz_tuple = parsedate_tz(date)
-        epoch_time = mktime_tz(tz_tuple)
-        self.message.add_header("X-Date", formatdate(epoch_time, localtime=True))
+        try:
+            tz_tuple = parsedate_tz(date)
+            epoch_time = mktime_tz(tz_tuple)
+            self.message.add_header("X-Date", formatdate(epoch_time, localtime=True))
+        except Exception as e:
+            self.message.add_header("X-Date", f'Error: {e}')
+
 
     def remove_header(self, header):
         """ Remove the named header """

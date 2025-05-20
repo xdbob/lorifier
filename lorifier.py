@@ -26,8 +26,10 @@ import time
 
 from email.utils import mktime_tz, parsedate_tz, formatdate
 
-LORE_MASK = 'https://lore.kernel.org/all/%s'
-
+LORE_FMT = "https://lore.kernel.org/{}/{}/"
+LORE_MLS = {
+    "qemu-devel@nongnu.org": "qemu-devel",
+}
 
 class muttemail:
     def __init__(self, raw_message):
@@ -70,8 +72,20 @@ class muttemail:
         if not message_id:
             return
 
-        lore_url = LORE_MASK % str(message_id).strip("<>")
-        self.message.add_header("X-URI", lore_url)
+        recipients_headers = self.message.get_all("To", [])
+        recipients_headers.extend(self.message.get_all("Cc", []))
+        recipients = [addr for _name, addr in email.utils.getaddresses(recipients_headers)]
+
+        for recipient in recipients:
+            mailing_list = LORE_MLS.get(recipient)
+            if mailing_list is None and recipient.endswith("@vger.kernel.org"):
+                mailing_list = recipient[:-len("@vger.kernel.org")]
+
+            if mailing_list:
+                self.message.add_header(
+                    "X-URI",
+                    LORE_FMT.format(mailing_list, message_id[1:-1])
+                )
 
 
 if __name__ == "__main__":

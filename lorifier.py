@@ -33,7 +33,7 @@ LORE_MLS = {
 
 class muttemail:
     def __init__(self, raw_message):
-        self.message = email.message_from_string(raw_message)
+        self.message = email.message_from_bytes(raw_message)
 
     def as_string(self):
         return self.message.as_string(policy=email.policy.EmailPolicy(utf8=True))
@@ -89,7 +89,7 @@ class muttemail:
 
 
 if __name__ == "__main__":
-    e = muttemail(sys.stdin.read())
+    e = muttemail(sys.stdin.buffer.read())
     e.create_xdate_header()
     e.create_xuri_header()
     #e.remove_header("Message-ID")

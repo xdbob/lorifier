@@ -32,11 +32,20 @@ LORE_MLS = {
 }
 
 class muttemail:
+    in_policy = email.policy.default
+    print_policy = email.policy.HTTP.clone(linesep=os.linesep)
+
     def __init__(self, raw_message):
-        self.message = email.message_from_bytes(raw_message)
+        self.message = email.message_from_bytes(
+            raw_message,
+            policy=self.in_policy,
+        )
 
     def as_string(self):
-        return self.message.as_string(policy=email.policy.EmailPolicy(utf8=True))
+        return self.message.as_string(policy=self.print_policy)
+
+    def as_bytes(self):
+        return self.message.as_bytes(policy=self.print_policy)
 
     def create_xdate_header(self):
         """ Add an X-Date header, which is Date converted to localtime. """
@@ -93,4 +102,5 @@ if __name__ == "__main__":
     e.create_xdate_header()
     e.create_xuri_header()
     #e.remove_header("Message-ID")
-    sys.stdout.write(e.as_string())
+    sys.stdout.buffer.write(e.as_bytes())
+    #sys.stdout.write(e.as_string())
